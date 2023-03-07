@@ -1,0 +1,71 @@
+{% extends 'layout/basic.html' %}
+{% load static %}
+
+{% block title %}
+    {% if curr_from and curr_to %}
+        {{ curr_from }} - {{ curr_to }}
+    {% else %}
+        Exchange App
+    {% endif %}
+{% endblock title %}
+
+{% block content %}
+<form id="my_form">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label">Amount</label>
+        <input type="text" class="form-control" id="exampleInputEmail1" name="amount" value="{{ amount }}">
+    </div>
+    <div style="display: flex; justify-content:space-around;">
+        <select name="curr_from" class="form-select">
+            {% for curr in curr_table %}
+                {% if curr == curr_from %}
+                    <option selected>{{ curr }}</option>
+                {% endif %}
+                <option>{{ curr }}</option>
+            {% endfor %}
+        </select>
+        <img src="{% static 'exchange/img/arrow.svg'%}" alt="arrow" style="width: 4%; height: 4%; margin-top: 10px;">
+        <select name="curr_to" class="form-select">
+            {% for curr in curr_table %}
+                {% if curr == curr_to %}
+                    <option selected>{{ curr }}</option>
+                {% endif %}
+                <option>{{ curr }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="total" id="total_div">
+        <h4 style="margin: auto;" id="total_h4"></h4>
+    </div>
+
+    <div style="display: flex;"><input type="submit" value="Confirm" class="btn btn-outline-primary" style="margin: 50px auto 0 auto;"></div>
+</form>
+
+{% endblock content %}
+
+{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    $('#my_form').submit( function (e) {
+        e.preventDefault();
+
+        var serializedData = $(this).serialize();
+
+    
+        $.ajax({
+            type: 'POST',
+            url: '{% url "post_index" %}',
+            data: serializedData,
+
+            success: function(response){
+            	console.log('total = ', response['total'])
+                $('#total_h4').html(response['total']);
+            },
+            error: function(response){
+                $('#total_h4').innerHTML = 'Oops, error!';
+            },
+        })
+    })
+</script>
+{% endblock js %}

@@ -1,0 +1,6 @@
+.DS_store
+.idea
+.env
+venv
+*.sqlite3
+*.db
